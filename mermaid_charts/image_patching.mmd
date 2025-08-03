@@ -1,0 +1,38 @@
+%%{init: {'theme': 'dark'}}%%
+flowchart TD
+    A[Original High-Res Image] --> B["load_image(max_num=12)"]
+    B --> C1["Crop 1 (448x448)"]
+    B --> C2["Crop 2 (448x448)"]
+    B --> C3[...]
+    B --> C12["Crop 12 (448x448)"]
+
+    subgraph model.extract_feature
+        direction TB
+        C1 --> D1{Vision Tower}
+        C2 --> D2{Vision Tower}
+        C12 --> D12{Vision Tower}
+        
+        D1 --> E1[Feature Vector Seq 1]
+        D2 --> E2[Feature Vector Seq 2]
+        D12 --> E12[Feature Vector Seq 12]
+    end
+
+    E1 --> F[Final Feature Tensor]
+    E2 --> F
+    E12 --> F
+
+    subgraph "Vision Tower Internals for one Crop"
+        direction LR
+        Crop --> P["Internal Patching (e.g., 16x16 grid)"] --> P_Embed[Sequence of Patch Embeddings] --> Transformer[Transformer Blocks] --> Features
+    end
+    
+    D1 -.-> Crop
+
+    %% Styling for dark mode
+    classDef default fill:#2d2d2d,stroke:#ccc,stroke-width:1px,color:#fff;
+    classDef subgraphStyle fill:#202020,stroke:#aaa,stroke-width:1px,color:#fff;
+    classDef finalNode fill:#004D40,stroke:#4DB6AC,color:white;
+
+    class A,B,C1,C2,C3,C12,D1,D2,D12,E1,E2,E12,Crop,P,P_Embed,Transformer,Features default;
+    class F finalNode;
+

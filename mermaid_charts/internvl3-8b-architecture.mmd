@@ -1,0 +1,50 @@
+flowchart TD
+    %% Input Layer
+    IMG[Image Input] --> VISION[Vision Tower]
+    TXT[Text Input] --> LANG[Language Tower]
+    
+    %% Vision Processing
+    subgraph VISION[Vision Tower]
+        direction TB
+        V1[Patch Embedding<br/>Conv2d] --> V2[InternVisionEncoder<br/>24 Layers]
+        V2 --> V3[InternAttention &<br/>InternMLP]
+        V3 --> V4[Vision Embeddings]
+    end
+    
+    %% Language Processing  
+    subgraph LANG[Language Tower]
+        direction TB
+        L1[Token Embedding] --> L2[Qwen2Model<br/>28 Decoder Layers]
+        L2 --> L3[Qwen2Attention &<br/>Qwen2MLP]
+        L3 --> L4[Text Embeddings]
+    end
+    
+    %% Multimodal Fusion
+    subgraph PROJ[Projector MLP]
+        direction TB
+        P1[LayerNorm] --> P2[Linear + GELU]
+        P2 --> P3[Linear Output]
+    end
+    
+    %% Output Generation
+    subgraph OUT[Output Layer]
+        O1[Language Head<br/>Linear] --> O2[Generated Text]
+    end
+    
+    %% Connections
+    V4 --> PROJ
+    PROJ --> L2
+    L4 --> OUT
+    
+    %% Dark Mode Styling
+    classDef inputNode fill:#1e3a8a,stroke:#3b82f6,stroke-width:2px,color:#ffffff
+    classDef visionNode fill:#7c2d92,stroke:#a855f7,stroke-width:2px,color:#ffffff
+    classDef langNode fill:#166534,stroke:#22c55e,stroke-width:2px,color:#ffffff
+    classDef projNode fill:#ea580c,stroke:#f97316,stroke-width:2px,color:#ffffff
+    classDef outputNode fill:#dc2626,stroke:#ef4444,stroke-width:2px,color:#ffffff
+    
+    class IMG,TXT inputNode
+    class VISION visionNode
+    class LANG langNode
+    class PROJ projNode
+    class OUT outputNode
